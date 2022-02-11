@@ -96,7 +96,9 @@ class MainActivity : ComponentActivity() {
                             }
                             previewView
 
-                        })
+                        },
+                        modifier = Modifier.weight(1f)
+                            )
                         Text(
                             text = code,
                             fontSize = 20.sp,
