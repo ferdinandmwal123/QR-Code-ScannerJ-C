@@ -14,13 +14,12 @@ import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
@@ -69,42 +68,48 @@ class MainActivity : ComponentActivity() {
 
                 Column(modifier = Modifier.fillMaxSize()) {
                     if (hasCamPermission) {
-                        AndroidView(factory = { context ->
-                            val previewView = PreviewView(context)
-                            val preview = Preview.Builder().build()
-                            val selector = CameraSelector.Builder()
-                                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                                .build()
-                            preview.setSurfaceProvider(previewView.surfaceProvider)
-                            val imageAnalysis = ImageAnalysis.Builder()
-                                .setTargetResolution(Size(previewView.width, previewView.height))
-                                .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)//method to define what happens if camera renders faster than code can abalyze
-                                .build()
+                        AndroidView(
+                            factory = { context ->
+                                val previewView = PreviewView(context)
+                                val preview = Preview.Builder().build()
+                                val selector = CameraSelector.Builder()
+                                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                                    .build()
+                                preview.setSurfaceProvider(previewView.surfaceProvider)
+                                val imageAnalysis = ImageAnalysis.Builder()
+                                    .setTargetResolution(
+                                        Size(
+                                            previewView.width,
+                                            previewView.height
+                                        )
+                                    )
+                                    .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)//method to define what happens if camera renders faster than code can abalyze
+                                    .build()
 
-                            imageAnalysis.setAnalyzer(
-                                ContextCompat.getMainExecutor(context),
-                                QRCodeAnalyzer { result ->
-                                    code = result
-                                }
-                            )
-                            try {
-                                cameraProviderFuture.get().bindToLifecycle(
-                                    lifecycleOwner, selector, preview, imageAnalysis
+                                imageAnalysis.setAnalyzer(
+                                    ContextCompat.getMainExecutor(context),
+                                    QRCodeAnalyzer { result ->
+                                        code = result
+                                    }
                                 )
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-                            previewView
+                                try {
+                                    cameraProviderFuture.get().bindToLifecycle(
+                                        lifecycleOwner, selector, preview, imageAnalysis
+                                    )
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                                previewView
 
-                        },
-                        modifier = Modifier.weight(1f)
-                            )
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
                         Text(
                             text = code,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
                                 .padding(32.dp)
                         )
                     }
